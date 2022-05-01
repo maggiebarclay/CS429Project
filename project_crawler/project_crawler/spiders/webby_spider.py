@@ -37,5 +37,3 @@ class WebbySpider(scrapy.Spider):
         with open(completeName, 'wb') as f:
             f.write(response.body)
         print(f'Saved file {filename}')
-
-

@@ -1,0 +1,7 @@
+<h1>Animal Crossing</h1>
+<h3>Search here to find more infomation about villagers:</h3>
+
+<form action="{{ url_for("query")}}" method="post">
+<label for="Query"></label>
+<input type="text" id="Query" name="query" placeholder="ex: 'blue dog':">
+<button type="submit">Search</button>
