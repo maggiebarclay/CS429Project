@@ -6,7 +6,27 @@
 import flask
 from flask import Flask, request, render_template
 import json
-import html
+import pickle
+
+# function which reads pickle file list from disk and merges to single inv idx
+def unPickle():
+  pickle_in = open('listPickle','rb')
+  unpickedLists = pickle.load(pickle_in)
+  invInd = {}
+  for tup in unpickedLists:
+      if tup[0] in invInd:
+        currList = invInd[tup[0]]
+        currList.append(str(tup[1]))
+        invInd[tup[0]] = currList
+      else: 
+        invInd[tup[0]] = [str(tup[1])]
+  for x, y in invInd.items():
+    invInd[x] = (list(set(y)))
+  return invInd
+invInd = unPickle()
+print(invInd)
+
+
 
 app = flask.Flask(__name__)
 
@@ -14,14 +34,11 @@ app = flask.Flask(__name__)
 def query():
      if request.method == "POST":
        query = request.form.get("query")
-       return "Here are some relevant villagers for the query: "+ query
-     return render_template("home.html")
-    # content_type = request.headers.get('Content-Type')
-    # if (content_type == 'application/json'):
-    #     json = request.json
-    #     return json
-    # else:
-    #     return 'Content-Type not supported!'
+       jsonQuery = '{"Query": "' + query + '"}'
+       json_object = json.loads(jsonQuery)
+       #print(json_object)
+       return render_template("home.html", jquery = json_object)
+    
 
 if __name__=='__main__':
    app.run(use_reloader=True)
