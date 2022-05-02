@@ -15,8 +15,10 @@ if __name__ == "__main__":
 
   characterList = []
   descriptionsList = []
+  picturesList = []
 
-  for filename in os.listdir("project_crawler/project_crawler/htmlFiles"):
+
+  for filename in os.listdir("project_crawler/project_crawler/htmlFiles/"):   
       try:
           #print("reading file: " + str(filename))
           with open("project_crawler/project_crawler/htmlFiles/" + str(filename), 'r') as f:
@@ -33,6 +35,9 @@ if __name__ == "__main__":
               description = "".join(descList)
               descriptionsList.append(description)
 
+              image = soup.find('meta', property="og:image").get('content')
+              picturesList.append(image)
+              
       except:
           print(filename)
           print("This is being skipped,likely because of an unrecognized letter/character")
@@ -40,9 +45,7 @@ if __name__ == "__main__":
 
   notInvertedIndex = {}
   for i in range(len(characterList)):
-    notInvertedIndex[characterList[i]] = descriptionsList[i]
-
-  #print(notInvertedIndex)
+    notInvertedIndex[characterList[i]] = (descriptionsList[i], picturesList[i])
 
   print("\npickling the 'not inverted index'")
   indexPickle = open('indexPickle','wb')

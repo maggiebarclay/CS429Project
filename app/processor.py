@@ -38,7 +38,7 @@ notInvInd = unPickle()[2]
 
 app = Flask(__name__)
 
-@app.route('/search')
+@app.route('/search',  methods = ['GET', 'POST'])
 def form():
     return render_template('form.html')
  
@@ -52,12 +52,14 @@ def data():
         jquery["Query"] = query
         results = cosineSimilarity(queryVector(tokenizedDocs, jquery["Query"]), invInd)
         names = []
+        descriptions = []
+        pictures = []
         for result in results[:10]:
           names.append(result[0])
-        descriptions = []
         for name in names:
-            descriptions.append(notInvInd[name])
-        return render_template("data.html", query = query, results = zip(names, descriptions))
+            descriptions.append(notInvInd[name][0])
+            pictures.append(notInvInd[name][1])
+        return render_template("data.html", query = query, results = zip(names, descriptions, pictures))
 
 if __name__=='__main__':
    app.run(use_reloader=True)
