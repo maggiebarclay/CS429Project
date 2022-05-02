@@ -170,24 +170,21 @@ def queryVector(docsList, query):
         queryIndx[term] = idf
   return queryIndx
 
-def cosineSimilarity(query, index):
-  import pickle
-  scores = {}
+import pickle
+pickle_in = open('tokPickle','rb')
+tokenizedDocList = pickle.load(pickle_in)
 
+def cosineSimilarity(query, index):
+  scores = {}
   for query_term, query_weight in query.items():
+      print(query_term, query_weight)
       for charNum, character, doc_weight in index[query_term][0][1]:
         if character not in scores: 
           scores[character] = query_weight * doc_weight
         else:
           scores[character] += query_weight * doc_weight  
-          
   finalScores = {}
-  pickle_in = open('tokPickle','rb')
-  tokenizedDocList = pickle.load(pickle_in)
   for character in scores.keys():
     finalScores[character] = (float(scores[character]) / (len(tokenizedDocList[int(charNum)])))
 
   return sorted(finalScores.items(), key=lambda x: x[1], reverse=True)
-
-def getTokenizedDocList():
-  return(tokenizedDocList)
