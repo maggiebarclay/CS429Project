@@ -1,7 +1,3 @@
-# export FLASK_APP=processor.py
-# export FLASK_DEBUG=1 
-# flask run
-
 
 # imports
 from unicodedata import name
@@ -17,7 +13,7 @@ from indexerScript import cosineSimilarity, queryVector
 
 # function which reads pickle file list from disk and merges to single inv idx
 def unPickle():
-  pickle_in = open('invIndPickle','rb')
+  pickle_in = open('../invIndPickle','rb')
   unpickledLists = pickle.load(pickle_in)
   invInd = {}
   for tup in unpickledLists:
@@ -29,9 +25,9 @@ def unPickle():
         invInd[term] = currList
     else: 
       invInd[term] = [(tup)]
-  pickle_in = open('tokPickle','rb')
+  pickle_in = open('../tokPickle','rb')
   tokenizedDocs = pickle.load(pickle_in)
-  pickle_in = open('indexPickle','rb')
+  pickle_in = open('../indexPickle','rb')
   notInvInd = pickle.load(pickle_in)
   return (invInd, tokenizedDocs, notInvInd)
 

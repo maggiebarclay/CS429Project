@@ -1,16 +1,14 @@
 # CS429Project
 
-The proposed system is comprised of three main components:
-SCRAPY CRAWLER
+TO RUN THE APPLICATION: 
 
--> downloads web documents in html format
--> project name: project_crawler
--> spider name: webby_spider
--> in project directory, scrapy crawl webby
--> DONT RUN THE CRAWLER, DOCUMENTS ALREADY SAVED LOCALLY
-    -> You can run it again but you'll just get the exact same html files which are already in this repo
-
-
-
-
-(base) maggiebarclay@Maggies-MacBook-Pro CS429Project % export FLASK_APP=processor 
+-> DOWNLOAD CODE LOCALLY
+-> INSTALL NECESSARY PACKAGES (use the generated requirements.txt to install)
+-> OPEN IN BROWSER http://127.0.0.1:5000/search
+-> YOU SHOULD NOT NEED TO RERUN THE WEB CRAWLER
+    -> IF DESIRED, RUN 'scrapy crawl webby' IN THE FIRST project_crawler DIRECTORY
+-> YOU SHOULD NOT NEED TO RERUN THE INDEXER 
+    -> ANY PARTS THAT ARE UTILIZED BY THE PROCESSOR IN REALTIME SEARCH ARE ACCESSED AUTOMATICALLY THROUGH THE PROCESSOR.PY CODE
+    -> IF DESIRED, RUN 'python indexerScript.py' (CS429Project > app > indexerScript.py)
+-> START FLASK APP BY RUNNING python processor.py (CS429Project > app > indexerScript.py)
+    -> ALTERNATIVELY, export FLASK_APP=processor AND THEN python -m flask run

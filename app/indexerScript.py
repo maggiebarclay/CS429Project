@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
   print("\npickling DF inv indx")
   calculateDF = calculateDF(tokenizedDocList)
-  dfPickle = open('dfPickle','wb')
+  dfPickle = open('../dfPickle','wb')
   pickle.dump(calculateDF,dfPickle)
   dfPickle.close()
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     #N is the number of docs 
     N = len(tokenizedDocList)
 
-    pickle_in = open('dfPickle','rb')
+    pickle_in = open('../dfPickle','rb')
     dfIndx = pickle.load(pickle_in)
 
     for doc in tokenizedDocList:
@@ -139,7 +139,7 @@ if __name__ == "__main__":
           listOfTups.append((term, invIndex[term]))
       
       print("\nwriting block of docs with indecies: " + str(start) + " through " +  str(start+blockSize))
-      invIndPickle = open('invIndPickle','wb')
+      invIndPickle = open('../invIndPickle','wb')
       pickle.dump(listOfTups,invIndPickle)
       invIndPickle.close()
 
@@ -153,7 +153,7 @@ def queryVector(docsList, query):
   print(query)
   query = query.split()
   queryIndx = {}
-  pickle_in = open('dfPickle','rb')
+  pickle_in = open('../dfPickle','rb')
   dfIndx = pickle.load(pickle_in)
 
   # idf = log (docs in corpus / docs with term in them)
@@ -171,7 +171,7 @@ def queryVector(docsList, query):
   return queryIndx
 
 import pickle
-pickle_in = open('tokPickle','rb')
+pickle_in = open('../tokPickle','rb')
 tokenizedDocList = pickle.load(pickle_in)
 
 def cosineSimilarity(query, index):
