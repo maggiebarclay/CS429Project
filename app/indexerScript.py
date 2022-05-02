@@ -38,7 +38,17 @@ if __name__ == "__main__":
           print("This is being skipped,likely because of an unrecognized letter/character")
           pass
 
-    
+  notInvertedIndex = {}
+  for i in range(len(characterList)):
+    notInvertedIndex[characterList[i]] = descriptionsList[i]
+
+  #print(notInvertedIndex)
+
+  print("\npickling the 'not inverted index'")
+  indexPickle = open('indexPickle','wb')
+  pickle.dump(notInvertedIndex,indexPickle)
+  indexPickle.close()
+
   tokenizedDocList = []
 
   def tokenizerMethod(docString: str):
@@ -162,17 +172,11 @@ def cosineSimilarity(query, index):
   scores = {}
 
   for query_term, query_weight in query.items():
-      #print("\n\nprinting here")
-      #print(index[query_term][0][1])
       for charNum, character, doc_weight in index[query_term][0][1]:
-        
         if character not in scores: 
           scores[character] = query_weight * doc_weight
-          #print(charNum, character, doc_weight)
-
         else:
           scores[character] += query_weight * doc_weight  
-          #print(charNum, character, doc_weight)
           
   finalScores = {}
   pickle_in = open('tokPickle','rb')
@@ -181,9 +185,6 @@ def cosineSimilarity(query, index):
     finalScores[character] = (float(scores[character]) / (len(tokenizedDocList[int(charNum)])))
 
   return sorted(finalScores.items(), key=lambda x: x[1], reverse=True)
-        
-  #results = cosineSimilarity(queryIndex, invIndex)
-  #print(results[:10])
 
 def getTokenizedDocList():
   return(tokenizedDocList)
