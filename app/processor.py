@@ -2,15 +2,19 @@
 # export FLASK_DEBUG=1 
 # flask run
 
+
 # imports
+from unittest import result
 from flask import Flask, request, render_template
 import json
-from Indexer import indexerScript
+import string
+import pickle
+from indexerScript import cosineSimilarity, queryVector
+
 
 # function which reads pickle file list from disk and merges to single inv idx
 def unPickle():
-  import pickle
-  pickle_in = open('listPickle','rb')
+  pickle_in = open('invIndPickle','rb')
   unpickledLists = pickle.load(pickle_in)
   invInd = {}
   for tup in unpickledLists:
@@ -22,33 +26,32 @@ def unPickle():
         invInd[term] = currList
     else: 
       invInd[term] = [(tup)]
-  return invInd
+  pickle_in = open('tokPickle','rb')
+  tokenizedDocs = pickle.load(pickle_in)
+  return (invInd, tokenizedDocs)
 
-invInd = unPickle()
-#print(invInd["$penguin$"])
+invInd = unPickle()[0]
+tokenizedDocs = unPickle()[1]
+
 
 app = Flask(__name__)
 
-@app.route("/query")
-def queryVectorizer(query, tokenizedDocList):
-  from indexerScript import queryVector
-  return(queryVector(query,tokenizedDocList))
 
-@app.route("/cosSim")
-def cosSim(query, invInd):
-  from indexerScript import cosineSimilarity, getTokenizedDocList 
-  return(cosineSimilarity(queryVectorizer(query, getTokenizedDocList),invInd))
-
-@app.route('/', methods=['GET','POST'])
+@app.route('/', methods=['POST'])
 def startQuery():
-      query = request.form.get("query")
-      jsonQuery = '{"Query": "' + str(query) + '"}'
-      results = cosSim(query, invInd)
-      print(results[:10])
-      json_object = json.loads(jsonQuery)
-    #  print(json_object)
-      return render_template("home.html", jquery = json_object)
+  jquery = " "
+
+  if request.method == 'POST':
+    render_template('home.html',  jquery = "")
+    query = request.form.get("query")
+    jquery = {}
+    jquery["Query"] = query
+    results = cosineSimilarity(queryVector(tokenizedDocs, jquery["Query"]), invInd)
+    return render_template("home.html", jquery = results[:10])
 
 if __name__=='__main__':
    app.run(use_reloader=True)
    app.run(host="0.0.0.0", port = 5000, debug=True)
+
+
+

@@ -1,7 +1,7 @@
 
 # get all of the info from html files
 # two lists, one of the names one with the descriptions
-
+  
 if __name__ == "__main__":
 # imports 
   import os
@@ -38,12 +38,6 @@ if __name__ == "__main__":
           print("This is being skipped,likely because of an unrecognized letter/character")
           pass
 
-
-  #print(characterList)
-  #print(len(characterList))
-  #print(descriptionsList)
-  #print(len(descriptionsList))
-
     
   tokenizedDocList = []
 
@@ -55,8 +49,10 @@ if __name__ == "__main__":
   for item in descriptionsList:
     tokenizedDocList.append(tokenizerMethod(item))
 
-  #print(tokenizedDocList[0])
-
+  print("\npickling tokenized doc list")
+  tokPickle = open('tokPickle','wb')
+  pickle.dump(tokenizedDocList,tokPickle)
+  tokPickle.close()
 
   # TFIDF
 
@@ -76,12 +72,21 @@ if __name__ == "__main__":
           invInd[word] = 1
     return invInd
 
+  print("\npickling DF inv indx")
+  calculateDF = calculateDF(tokenizedDocList)
+  dfPickle = open('dfPickle','wb')
+  pickle.dump(calculateDF,dfPickle)
+  dfPickle.close()
+
+
   def makeInvInd(tokenizedDocList: list):
     invInd = {}
     index = -1
     #N is the number of docs 
     N = len(tokenizedDocList)
-    dfIndx = calculateDF(tokenizedDocList)
+
+    pickle_in = open('dfPickle','rb')
+    dfIndx = pickle.load(pickle_in)
 
     for doc in tokenizedDocList:
       index += 1
@@ -101,48 +106,9 @@ if __name__ == "__main__":
           
         else:   
           invInd[formatWord] = [(str(index), str(characterList[index]), tfidf)]
-
     return invInd
 
   invIndex = makeInvInd(tokenizedDocList)
-
-  # the method below is a user friendly way to lookup, just put in a word as usual and it will do the $ addition for you
-  def lookupInDocs(term):
-    term = "$" + term + "$"
-    return invIndex[term]
-
-  #print(lookupInDocs("dog"))
-
-  def queryVector(docsList, query):
-    query = query.split()
-    queryIndx = {}
-    dfIndx = calculateDF(docsList)
-
-    # idf = log (docs in corpus / docs with term in them)
-    N = len(docsList)
-
-    for term in query:
-      term = "$" + term + "$"
-      df = dfIndx[term]
-      idf = np.log(N/(df))
-
-      if term in queryIndx:    
-          pass
-      else:   
-          queryIndx[term] = idf
-    return queryIndx
-
-
-  #queryIndex = queryVector(tokenizedDocList, "blue dog")
-  #queryIndex
-
-    
-  # function to process batch of docs & write inv block to disk w pickle
-  # BSBI -> parses documents into termID–VillagerName-tfidf tuples and 
-  # BSBI -> accumulates the pairs in memory until a block of a fixed size is full 
-  # The block is then inverted and written to disk
-  # Inversion ->  sort the tups
-  # Inversion ->  collect all tups with the same termID into a postings list
 
   numberOfBatches = 3
 
@@ -159,40 +125,65 @@ if __name__ == "__main__":
           term = "$" + term + "$"
           listOfTups.append((term, invIndex[term]))
       
-      print("writing block of docs with indecies: " + str(start) + " through " +  str(start+blockSize))
-      listfile = open('listPickle','wb')
-      pickle.dump(listOfTups,listfile)
-      listfile.close()
+      print("\nwriting block of docs with indecies: " + str(start) + " through " +  str(start+blockSize))
+      invIndPickle = open('invIndPickle','wb')
+      pickle.dump(listOfTups,invIndPickle)
+      invIndPickle.close()
 
       start += blockSize
 
   processDocs(tokenizedDocList, invIndex, numberOfBatches)
 
-  #invIndex = makeInvInd(tokenizedDocList)
-  #invIndex["$penguin$"]
+def queryVector(docsList, query):
+  import numpy as np
+  import pickle
+  print(query)
+  query = query.split()
+  queryIndx = {}
+  pickle_in = open('dfPickle','rb')
+  dfIndx = pickle.load(pickle_in)
 
+  # idf = log (docs in corpus / docs with term in them)
+  N = len(docsList)
 
-  def cosineSimilarity(query, index):
-    scores = {}
+  for term in query:
+    term = "$" + term + "$"
+    df = dfIndx[term]
+    idf = np.log(N/(df))
 
-    for query_term, query_weight in query.items():
-        for charNum, character, doc_weight in index[query_term]:
+    if term in queryIndx:    
+        pass
+    else:   
+        queryIndx[term] = idf
+  return queryIndx
+
+def cosineSimilarity(query, index):
+  import pickle
+  scores = {}
+
+  for query_term, query_weight in query.items():
+      #print("\n\nprinting here")
+      #print(index[query_term][0][1])
+      for charNum, character, doc_weight in index[query_term][0][1]:
+        
+        if character not in scores: 
+          scores[character] = query_weight * doc_weight
+          #print(charNum, character, doc_weight)
+
+        else:
+          scores[character] += query_weight * doc_weight  
+          #print(charNum, character, doc_weight)
           
-          if character not in scores: 
-            scores[character] = query_weight * doc_weight
-            #print(charNum, character, doc_weight)
-          else:
-            scores[character] += query_weight * doc_weight  
-            #print(charNum, character, doc_weight)
+  finalScores = {}
+  pickle_in = open('tokPickle','rb')
+  tokenizedDocList = pickle.load(pickle_in)
+  for character in scores.keys():
+    finalScores[character] = (float(scores[character]) / (len(tokenizedDocList[int(charNum)])))
 
-    finalScores = {}
-    for character in scores.keys():
-      finalScores[character] = (float(scores[character]) / (len(tokenizedDocList[int(charNum)])))
-
-    return sorted(finalScores.items(), key=lambda x: x[1], reverse=True)
+  return sorted(finalScores.items(), key=lambda x: x[1], reverse=True)
         
   #results = cosineSimilarity(queryIndex, invIndex)
   #print(results[:10])
 
-  def getTokenizedDocList():
-    return(tokenizedDocList)
+def getTokenizedDocList():
+  return(tokenizedDocList)
