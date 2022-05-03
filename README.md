@@ -15,5 +15,4 @@
     * ANY PARTS THAT ARE UTILIZED BY THE PROCESSOR IN REALTIME SEARCH ARE ACCESSED AUTOMATICALLY THROUGH THE PROCESSOR.PY CODE
     * IF DESIRED, RUN 'python indexerScript.py' (CS429Project > app > indexerScript.py)
 
-* START FLASK APP BY RUNNING python processor.py (CS429Project > app > indexerScript.py)
-    * ALTERNATIVELY, export FLASK_APP=processor AND THEN python -m flask run
+* START FLASK APP BY RUNNING export FLASK_APP=processor AND THEN python -m flask run (in the app folder)
